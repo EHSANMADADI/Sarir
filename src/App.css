@@ -1,9 +1,7 @@
 .hero-banr{
   background-image: url('../src/IMG/Group.png');
-  background-size: initial;
+  background-size: cover;
   background-repeat: no-repeat;
-
- 
- 
-
+  background-attachment: fixed;
+  background-position: center;
 }

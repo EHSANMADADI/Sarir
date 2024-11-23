@@ -26,12 +26,12 @@ export default function ItemsComponents({
         className={`${bgClassName} rounded-tl-3xl rounded-tr-3xl h-96 relative overflow-hidden`}
       >
         {/* لایه سیاه کم‌رنگ */}
-        <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+       
 
         {/* متن "ورود به وب سایت" */}
         <a
           href="#"
-          className="absolute inset-0 flex items-center justify-center text-white text-xl font-bold opacity-0 hover:opacity-100 transition-opacity duration-300"
+          className="absolute z-50 inset-0 flex bg-black  bg-opacity-30 h-[20.7rem]  items-center justify-center text-white text-xl font-bold opacity-0 hover:opacity-100 transition-opacity duration-300"
         >
           ورود به وب سایت
           <span className="text-4xl">

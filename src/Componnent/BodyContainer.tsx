@@ -10,7 +10,7 @@ export default function BodyContainer() {
   const [showWebSite, setShowWebsite] = useState(false);
   return (
     <div
-     className="flex flex-wrap items-start justify-between gap-5 w-2/3 mx-auto"
+     className="flex flex-wrap items-start xl:justify-between justify-center gap-5 w-2/3 mx-auto"
       dir="rtl"
     >
       <ItemsComponnets

@@ -1,60 +1,64 @@
-.hero-banr{
-  background-image: url('../src/IMG/Group.png');
+.hero-banr {
+  background-image: url("../src/IMG/test1.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center;
 }
+@media (max-width: 1300px) {
+  .hero-banr {
+    background-image: url("../src/IMG/test.png");
+  }
+}
 @font-face {
-  font-family: 'nastaliq';
-  src: url('./font/IranNastaliq.ttf') format('ttf'),
-  url('./font/IranNastaliq.eot') format('eot'),
-  url('./font/IranNastaliq.otf') format('otf'),
-  url('./font/IranNastaliq.ttf') format('ttf'),
-  url('./font/IranNastaliq.woff') format('woff'),
-  url('./font/IranNastaliq.woff2') format('wpff2');
+  font-family: "nastaliq";
+  src: url("./font/IranNastaliq.ttf") format("ttf"),
+    url("./font/IranNastaliq.eot") format("eot"),
+    url("./font/IranNastaliq.otf") format("otf"),
+    url("./font/IranNastaliq.ttf") format("ttf"),
+    url("./font/IranNastaliq.woff") format("woff"),
+    url("./font/IranNastaliq.woff2") format("wpff2");
   font-weight: normal;
   font-style: normal;
 }
 
-
-.font-nastaliqh{
-font-family:'nastaliq';
+.font-nastaliqh {
+  font-family: "nastaliq";
 }
 
-.bg-photoASR{
-  background-image: url('../src/IMG/1.png');
+.bg-photoASR {
+  background-image: url("../src/IMG/1.png");
   background-size: contain;
   background-repeat: no-repeat;
   /* background-position: center; */
 }
-.bg-photoOCR{
-  background-image: url('../src/IMG/2.png');
+.bg-photoOCR {
+  background-image: url("../src/IMG/2.png");
   background-size: contain;
   background-repeat: no-repeat;
   /* background-position: center; */
 }
-.bg-photoVAD{
-  background-image: url('../src/IMG/5.png');
+.bg-photoVAD {
+  background-image: url("../src/IMG/5.png");
   background-size: contain;
   background-repeat: no-repeat;
   /* background-position: center; */
 }
-.bg-photoSE{
-  background-image: url('../src/IMG/4.png');
+.bg-photoSE {
+  background-image: url("../src/IMG/4.png");
   background-size: contain;
   background-repeat: no-repeat;
   /* background-position: center; */
 }
-.bg-photoSEGA{
-  background-image: url('../src/IMG/2.png');
+.bg-photoSEGA {
+  background-image: url("../src/IMG/2.png");
   background-size: contain;
   background-repeat: no-repeat;
   /* background-position: center; */
 }
 
-.bg-photoOCR{
-  background-image: url('../src/IMG/3.png');
+.bg-photoOCR {
+  background-image: url("../src/IMG/3.png");
   background-size: contain;
   background-repeat: no-repeat;
   /* background-position: center; */

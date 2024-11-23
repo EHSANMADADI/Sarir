@@ -1,13 +1,13 @@
-import React, { useRef } from 'react';
-import BgEmam from '../Componnent/BgEmam';
-import Container from '../Componnent/Container';
+import React, { useRef } from "react";
+import BgEmam from "../Componnent/BgEmam";
+import Container from "../Componnent/Container";
 
 export default function FerstPage() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleScrollDown = () => {
     if (containerRef.current) {
-      containerRef.current.scrollIntoView({ behavior: 'smooth' });
+      containerRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 

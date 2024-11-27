@@ -7,6 +7,7 @@ module.exports = {
     extend: {
       fontFamily: {
         nastaliq: ['nastaliq'],
+        Byekan:['Byekan']
       },
     },
   },

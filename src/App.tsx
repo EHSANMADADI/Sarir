@@ -1,13 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import FerstPage from './Page/FerstPage';
-
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import FerstPage from "./Page/FerstPage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ASRPage from "./Page/ASRPage";
 function App() {
   return (
-   <div className='w-full'>
-   <FerstPage/>
-   </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<FerstPage />} />
+        <Route path="/ASR" element={<ASRPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

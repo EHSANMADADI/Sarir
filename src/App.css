@@ -2,8 +2,9 @@
   background-image: url("../src/IMG/test1.png");
   background-size: cover;
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* background-attachment: fixed; */
   background-position: center;
+
 }
 @media (max-width: 1300px) {
   .hero-banr {
@@ -20,6 +21,15 @@
     url("./font/IranNastaliq.woff2") format("wpff2");
   font-weight: normal;
   font-style: normal;
+}
+@font-face{
+  font-family:"Byekan";
+  src: url("./font/Yekan.ttf") format("ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+.font-Byekan{
+  font-family: "Byekan";
 }
 
 .font-nastaliqh {

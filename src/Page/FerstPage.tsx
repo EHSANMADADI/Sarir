@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import BgEmam from "../Componnent/BgEmam";
-import Container from "../Componnent/Container";
+import BgEmam from "../Componnent/FerstComponent/BgEmam";
+import Container from "../Componnent/FerstComponent/Container";
 
 export default function FerstPage() {
   const containerRef = useRef<HTMLDivElement>(null);

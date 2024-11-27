@@ -10,14 +10,14 @@ export default function BodyContainer() {
   const [showWebSite, setShowWebsite] = useState(false);
   return (
     <div
-     className="flex flex-wrap items-start xl:justify-between justify-center gap-5 w-2/3 mx-auto"
+     className="flex flex-wrap items-start xl:justify-between justify-center xl:gap-5 gap-2 w-2/3 mx-auto"
       dir="rtl"
     >
       <ItemsComponnets
         id={1}
         title="ASR"
         discription="فناوری است که گفتار انسان را به متن دیجیتال قابل ویرایش تبدیل میکند"
-        link=""
+        link="/ASR"
         key={1}
         bgClassName="bg-photoASR"
       />
@@ -25,7 +25,7 @@ export default function BodyContainer() {
         id={2}
         title="OCR"
         discription="فناوری است که متن را از تصویر و اسناد اسکن شده به متن دیجیتال قابل ویرایش تبدیل میکند"
-        link=""
+        link="http://195.191.45.56:17010"
         key={2}
         bgClassName="bg-photoOCR"
       />

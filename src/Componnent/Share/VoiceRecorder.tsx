@@ -59,15 +59,34 @@ const VoiceRecorder: React.FC = () => {
   const handleStopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const url = URL.createObjectURL(audioBlob);
+        setAudioURLs(url);
+  
+        // Convert blob to base64
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Audio = reader.result;
+          
+          // Save to localStorage
+          const recordings = JSON.parse(localStorage.getItem("recordings") || "[]");
+          recordings.push({ name: fileName, audio: base64Audio });
+          localStorage.setItem("recordings", JSON.stringify(recordings));
+  
+          audioChunksRef.current = [];
+          setFileNames(fileName);
+          setFileName("");
+        };
+        reader.readAsDataURL(audioBlob);
+      };
     }
     setIsRecording(false);
     setIsPaused(false);
-    setFileNames(fileName)
-    setFileName('');
+    setFileName('')
   };
-  console.log(audioURLs);
-  console.log(fileNames);
   
+
 
   return (
     <div>
@@ -82,9 +101,7 @@ const VoiceRecorder: React.FC = () => {
           type="text"
           dir="rtl"
           value={fileName}
-          onChange={(e) => (
-            setFileName(e.target.value)
-          )}
+          onChange={(e) => setFileName(e.target.value)}
           className="bg-white focus:outline-blue-600 focus:outline-4 border border-gray-200 px-5 py-1"
         />
       </div>

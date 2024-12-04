@@ -3,6 +3,7 @@ import { FaCloudUploadAlt, FaPlay } from "react-icons/fa";
 import { IoPauseOutline } from "react-icons/io5";
 import { MdDeleteSweep, MdRectangle } from "react-icons/md";
 import { PiRecordFill } from "react-icons/pi";
+import VoiceRecorder from "../Share/VoiceRecorder";
 
 export default function VADbody() {
   const [file, setFile] = useState<File | null>(null);
@@ -61,7 +62,7 @@ export default function VADbody() {
           )}
         </div>
 
-        <div className="flex justify-end mb-7">
+        {/* <div className="flex justify-end mb-7">
           <span className="text-gray-500 font-Byekan font-bold text-lg">
             :رکورد فایل
           </span>
@@ -95,7 +96,9 @@ export default function VADbody() {
               <IoPauseOutline />
             </span>
           </div>
-        </div>
+        </div> */}
+
+        <VoiceRecorder/>
       </div>
     </div>
   );

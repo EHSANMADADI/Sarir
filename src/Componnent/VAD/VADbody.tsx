@@ -1,12 +1,15 @@
+/* eslint-disable eqeqeq */
 import React, { useState } from "react";
 import { FaCloudUploadAlt, FaPlay } from "react-icons/fa";
 import { IoPauseOutline } from "react-icons/io5";
 import { MdDeleteSweep, MdRectangle } from "react-icons/md";
 import { PiRecordFill } from "react-icons/pi";
 import VoiceRecorder from "../Share/VoiceRecorder";
+import { useStore } from "../../Store/Store";
 
 export default function VADbody() {
   const [file, setFile] = useState<File | null>(null);
+  const { audioURLs, fileNames } = useStore();
   const handleButtonClick = () => {
     document.getElementById("dropzone-file")?.click();
   };
@@ -21,11 +24,37 @@ export default function VADbody() {
   return (
     <div className="bg-blue-50 max-h-screen h-auto flex font-Byekan  mt-20 justify-around">
       <div className="extended-file">
-        <div className="flex justify-end">
-          <span className="text-gray-500 font-Byekan  text-lg">
-            : فایل های موجود برای حذف قسمت های سکوت
-          </span>
-        </div>
+        {audioURLs.length > 0 ? (
+          <>
+            <div className="flex justify-end">
+              <span className="text-gray-500 font-Byekan text-lg">
+                : فایل های موجود برای حذف قسمت های سکوت
+              </span>
+            </div>
+            <div className="flex justify-end p-3 my-3 text-gray-500 font-semibold">
+              :فایل اصلی
+            </div>
+            <div className="border-b-2 border-gray-600">
+              {audioURLs.map((item, index) => (
+                <div className='my-2' key={index}>
+                  <span>{fileNames[index]}:</span>
+                  <span className="my-2">
+                    <audio
+                      controls
+                      src={item}
+                      className="w-full  border border-red-300 rounded-md"
+                    />
+                  </span>
+                  <span dir="rtl"  className="px-5 cursor-pointer  py-1 bg-gradient-to-r from-blue-600 to-blue-950 opacity-80 rounded-2xl shadow-2xl hover:opacity-100 border-[3px] border-blue-200 text-white"
+                  >شروع به تبدیل</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end p-3 my-3 text-gray-500 font-semibold">
+              :فایل بهینه شده
+            </div>
+          </>
+        ) : <span className="text-xl font-bold text-gray-600">فایلی وجود ندارد</span>}
       </div>
 
       <div className="input-div ">
@@ -61,44 +90,7 @@ export default function VADbody() {
             </div>
           )}
         </div>
-
-        {/* <div className="flex justify-end mb-7">
-          <span className="text-gray-500 font-Byekan font-bold text-lg">
-            :رکورد فایل
-          </span>
-        </div>
-        <div className="mb-5">
-          <input
-            placeholder="اسم فایل رکورد ..."
-            type="text"
-            dir="rtl"
-            className="bg-white focus:outline-blue-600 focus:outline-4 border border-gray-200 px-5 py-1"
-          />
-        </div>
-        <div className="flex items-center justify-between mb-5">
-          <div className="bg-gray-200 cursor-pointer p-2 rounded-full">
-            <span className="text-red-600 text-3xl">
-              <PiRecordFill />
-            </span>
-          </div>
-          <div className="bg-gray-200 cursor-pointer p-3 rounded-full">
-            <span className="text-blue-600 text-xl">
-              <FaPlay />
-            </span>
-          </div>
-          <div className="bg-gray-200 cursor-pointer p-3 rounded-full">
-            <span className="text-red-400 text-xl">
-              <MdRectangle />
-            </span>
-          </div>
-          <div className="bg-gray-200 cursor-pointer p-3 rounded-full">
-            <span className="text-blue-500 text-xl">
-              <IoPauseOutline />
-            </span>
-          </div>
-        </div> */}
-
-        <VoiceRecorder/>
+        <VoiceRecorder />
       </div>
     </div>
   );

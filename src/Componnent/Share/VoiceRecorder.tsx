@@ -3,14 +3,15 @@ import { FaMicrophone, FaStop, FaDownload, FaPlay } from "react-icons/fa";
 import { IoPauseOutline } from "react-icons/io5";
 import { MdRectangle } from "react-icons/md";
 import { PiRecordFill } from "react-icons/pi";
-
+import { useStore } from "../../Store/Store";
 const VoiceRecorder: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [audioURL, setAudioURL] = useState<string>("");
+  //   const [audioURL, setAudioURL] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const { audioURLs, setAudioURLs, fileNames, setFileNames } = useStore();
 
   const handleStartRecording = async () => {
     try {
@@ -24,7 +25,7 @@ const VoiceRecorder: React.FC = () => {
           type: "audio/webm",
         });
         const url = URL.createObjectURL(audioBlob);
-        setAudioURL(url);
+        setAudioURLs(url);
         audioChunksRef.current = [];
       };
       mediaRecorderRef.current.start();
@@ -61,7 +62,12 @@ const VoiceRecorder: React.FC = () => {
     }
     setIsRecording(false);
     setIsPaused(false);
+    setFileNames(fileName)
+    setFileName('');
   };
+  console.log(audioURLs);
+  console.log(fileNames);
+  
 
   return (
     <div>
@@ -76,21 +82,28 @@ const VoiceRecorder: React.FC = () => {
           type="text"
           dir="rtl"
           value={fileName}
-          onChange={(e) => setFileName(e.target.value)}
+          onChange={(e) => (
+            setFileName(e.target.value)
+          )}
           className="bg-white focus:outline-blue-600 focus:outline-4 border border-gray-200 px-5 py-1"
         />
       </div>
       <div className="flex items-center justify-center mb-5">
-        <div
-          onClick={fileName ? handleStartRecording : undefined}
-          className={`${
-            fileName ? "bg-gray-200 cursor-pointer" : "bg-gray-400 cursor-not-allowed"
-          } p-3 rounded-full mx-1`}
-        >
-          <span className="text-red-400 text-xl">
-            <PiRecordFill />
-          </span>
-        </div>
+        {!isRecording && (
+          <div
+            onClick={fileName ? handleStartRecording : undefined}
+            className={`${
+              fileName
+                ? "bg-gray-200 cursor-pointer"
+                : "bg-gray-400 cursor-not-allowed"
+            } p-3 rounded-full mx-1`}
+          >
+            <span className="text-red-400 text-xl">
+              <PiRecordFill />
+            </span>
+          </div>
+        )}
+
         {isPaused && (
           <div
             onClick={handleResumeRecording}
@@ -122,7 +135,7 @@ const VoiceRecorder: React.FC = () => {
           </div>
         )}
       </div>
-      {audioURL && (
+      {/* {audioURL && (
         <div className="mt-4">
           <audio controls src={audioURL} className="w-full" />
           <a
@@ -134,7 +147,7 @@ const VoiceRecorder: React.FC = () => {
             Download Recording
           </a>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

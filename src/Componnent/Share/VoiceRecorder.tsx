@@ -1,17 +1,23 @@
 import React, { useState, useRef } from "react";
-import { FaMicrophone, FaStop, FaDownload, FaPlay } from "react-icons/fa";
+import { FaPlay } from "react-icons/fa";
 import { IoPauseOutline } from "react-icons/io5";
 import { MdRectangle } from "react-icons/md";
 import { PiRecordFill } from "react-icons/pi";
-import { useStore } from "../../Store/Store";
-const VoiceRecorder: React.FC = () => {
+
+interface VoiceRecorderProps {
+  nameComponent: string;
+  onRecordingComplete: (recording: { name: string; audio: string }) => void;
+}
+
+export default function VoiceRecorder({
+  nameComponent,
+  onRecordingComplete,
+}: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  //   const [audioURL, setAudioURL] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const { audioURLs, setAudioURLs, fileNames, setFileNames } = useStore();
 
   const handleStartRecording = async () => {
     try {
@@ -25,8 +31,27 @@ const VoiceRecorder: React.FC = () => {
           type: "audio/webm",
         });
         const url = URL.createObjectURL(audioBlob);
-        setAudioURLs(url);
-        audioChunksRef.current = [];
+
+        // Convert blob to base64
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Audio = reader.result as string;
+          const recording = { name: fileName, audio: base64Audio };
+
+          // Save to localStorage
+          const recordings = JSON.parse(
+            localStorage.getItem(nameComponent) || "[]"
+          );
+          recordings.push(recording);
+          localStorage.setItem(nameComponent, JSON.stringify(recordings));
+
+          // Update parent state
+          onRecordingComplete(recording);
+
+          audioChunksRef.current = [];
+          setFileName("");
+        };
+        reader.readAsDataURL(audioBlob);
       };
       mediaRecorderRef.current.start();
       setIsRecording(true);
@@ -59,34 +84,10 @@ const VoiceRecorder: React.FC = () => {
   const handleStopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        const url = URL.createObjectURL(audioBlob);
-        setAudioURLs(url);
-  
-        // Convert blob to base64
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64Audio = reader.result;
-          
-          // Save to localStorage
-          const recordings = JSON.parse(localStorage.getItem("recordings") || "[]");
-          recordings.push({ name: fileName, audio: base64Audio });
-          localStorage.setItem("recordings", JSON.stringify(recordings));
-  
-          audioChunksRef.current = [];
-          setFileNames(fileName);
-          setFileName("");
-        };
-        reader.readAsDataURL(audioBlob);
-      };
     }
     setIsRecording(false);
     setIsPaused(false);
-    setFileName('')
   };
-  
-
 
   return (
     <div>
@@ -120,7 +121,6 @@ const VoiceRecorder: React.FC = () => {
             </span>
           </div>
         )}
-
         {isPaused && (
           <div
             onClick={handleResumeRecording}
@@ -152,21 +152,6 @@ const VoiceRecorder: React.FC = () => {
           </div>
         )}
       </div>
-      {/* {audioURL && (
-        <div className="mt-4">
-          <audio controls src={audioURL} className="w-full" />
-          <a
-            href={audioURL}
-            download={`${fileName}.webm`}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-2 inline-block"
-          >
-            <FaDownload className="mr-2 inline-block" />
-            Download Recording
-          </a>
-        </div>
-      )} */}
     </div>
   );
-};
-
-export default VoiceRecorder;
+}

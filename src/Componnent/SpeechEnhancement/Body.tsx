@@ -101,7 +101,7 @@ export default function Body() {
           )}
         </div>
 
-        <VoiceRecorder/>
+        {/* <VoiceRecorder nameComponent={selectedLanguages}/> */}
       </div>
     </div>
   )

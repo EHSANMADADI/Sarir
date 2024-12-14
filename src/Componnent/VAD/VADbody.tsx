@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { MdDeleteForever } from "react-icons/md";
+import { MdDeleteForever, MdDeleteSweep } from "react-icons/md";
 import VoiceRecorder from "../Share/VoiceRecorder";
 
 export default function VADBody() {
@@ -27,7 +27,9 @@ export default function VADBody() {
   const handleNewRecording = (recording: { name: string; audio: string }) => {
     setSavedRecordings((prev: any) => [...prev, recording]);
   };
-
+  const handleButtonClick = () => {
+    document.getElementById("dropzone-file")?.click();
+  };
   useEffect(() => {
     localStorage.setItem("VAD", JSON.stringify(savedRecordings));
   }, [savedRecordings]);
@@ -60,9 +62,10 @@ export default function VADBody() {
                         <MdDeleteForever />
                       </span>
 
-                      <span className="text-white text-base mx-2 bg-gradient-to-r px-6 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950"
-                      > تبدیل</span>
-
+                      <span className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950">
+                        {" "}
+                        تبدیل
+                      </span>
                     </div>
                   </div>
                 )
@@ -71,7 +74,7 @@ export default function VADBody() {
           </>
         ) : (
           <span className="text-xl font-bold text-gray-600">
-            فایلی برای نمایش  وجود ندارد
+            فایلی برای نمایش وجود ندارد
           </span>
         )}
       </div>
@@ -83,6 +86,31 @@ export default function VADBody() {
           className="hidden"
           onChange={handleFileChange}
         />
+        <div className="flex justify-end mb-5">
+          <span className="text-gray-500 font-Byekan font-bold text-lg">
+            : انتخاب فایل از سیستم
+          </span>
+        </div>
+
+        <div className="mb-16 flex" dir="rtl">
+          <button
+            onClick={handleButtonClick}
+            className="flex items-center px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-950 opacity-80 rounded-xl font-black text-xl shadow-2xl hover:opacity-100 border-[3px] border-blue-200 text-white"
+          >
+            انتخاب فایل ها
+            <span className="mr-2">
+              <FaCloudUploadAlt />
+            </span>
+          </button>
+          {file && (
+            <div className="flex items-center mx-2">
+              <span className="text-red-700 cursor-pointer">
+                <MdDeleteSweep />
+              </span>
+              <span className="ml-4 text-gray-700">{file.name} </span>
+            </div>
+          )}
+        </div>
         <VoiceRecorder
           nameComponent="VAD"
           onRecordingComplete={handleNewRecording}

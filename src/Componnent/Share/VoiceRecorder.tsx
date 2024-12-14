@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FaPlay } from "react-icons/fa";
 import { IoPauseOutline } from "react-icons/io5";
 import { MdRectangle } from "react-icons/md";
-import { PiRecordFill } from "react-icons/pi";
+import { CiMicrophoneOn } from "react-icons/ci";
 
 interface VoiceRecorderProps {
   nameComponent: string;
@@ -16,8 +16,10 @@ export default function VoiceRecorder({
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [fileName, setFileName] = useState<string>("");
+  const [recordingTime, setRecordingTime] = useState(0); // Counter state
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null); // Ref for the timer
 
   const handleStartRecording = async () => {
     try {
@@ -56,6 +58,12 @@ export default function VoiceRecorder({
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setIsPaused(false);
+
+      // Start timer
+      setRecordingTime(0);
+      timerRef.current = setInterval(() => {
+        setRecordingTime((prevTime) => prevTime + 1);
+      }, 1000);
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
@@ -68,6 +76,11 @@ export default function VoiceRecorder({
     ) {
       mediaRecorderRef.current.pause();
       setIsPaused(true);
+
+      // Pause timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     }
   };
 
@@ -78,6 +91,11 @@ export default function VoiceRecorder({
     ) {
       mediaRecorderRef.current.resume();
       setIsPaused(false);
+
+      // Resume timer
+      timerRef.current = setInterval(() => {
+        setRecordingTime((prevTime) => prevTime + 1);
+      }, 1000);
     }
   };
 
@@ -87,7 +105,21 @@ export default function VoiceRecorder({
     }
     setIsRecording(false);
     setIsPaused(false);
+
+    // Stop timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
   };
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div>
@@ -116,8 +148,8 @@ export default function VoiceRecorder({
                 : "bg-gray-400 cursor-not-allowed"
             } p-3 rounded-full mx-1`}
           >
-            <span className="text-red-400 text-xl">
-              <PiRecordFill />
+            <span className="text-white text-2xl">
+              <CiMicrophoneOn />
             </span>
           </div>
         )}
@@ -152,6 +184,11 @@ export default function VoiceRecorder({
           </div>
         )}
       </div>
+      {isRecording && (
+        <div className="text-center text-gray-700 font-bold text-lg">
+          {recordingTime}s
+        </div>
+      )}
     </div>
   );
 }

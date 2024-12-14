@@ -6,6 +6,7 @@ import { MdRectangle } from "react-icons/md";
 import { IoPauseOutline } from "react-icons/io5";
 import { MdDeleteSweep } from "react-icons/md";
 import { CiSquareChevDown } from "react-icons/ci";
+import VoiceRecorder from "../Share/VoiceRecorder";
 export default function ASRbody() {
   const [file, setFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -101,41 +102,7 @@ export default function ASRbody() {
           )}
         </div>
 
-        <div className="flex justify-end mb-7">
-          <span className="text-gray-500 font-Byekan font-bold text-lg">
-            :رکورد فایل
-          </span>
-        </div>
-        <div className="mb-5">
-          <input
-            placeholder="اسم فایل رکورد ..."
-            type="text"
-            dir="rtl"
-            className="bg-white focus:outline-blue-600 focus:outline-4 border border-gray-200 px-5 py-1"
-          />
-        </div>
-        <div className="flex items-center justify-between mb-5">
-          <div className="bg-gray-200 cursor-pointer p-2 rounded-full">
-            <span className="text-red-600 text-3xl">
-              <PiRecordFill />
-            </span>
-          </div>
-          <div className="bg-gray-200 cursor-pointer p-3 rounded-full">
-            <span className="text-blue-600 text-xl">
-              <FaPlay />
-            </span>
-          </div>
-          <div className="bg-gray-200 cursor-pointer p-3 rounded-full">
-            <span className="text-red-400 text-xl">
-              <MdRectangle />
-            </span>
-          </div>
-          <div className="bg-gray-200 cursor-pointer p-3 rounded-full">
-            <span className="text-blue-500 text-xl">
-              <IoPauseOutline />
-            </span>
-          </div>
-        </div>
+        <VoiceRecorder />
       </div>
     </div>
   );

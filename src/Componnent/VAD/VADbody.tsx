@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { MdDeleteForever, MdDeleteSweep } from "react-icons/md";
 import VoiceRecorder from "../Share/VoiceRecorder";
+import WavesurferPlayer from "@wavesurfer/react";
+import { FaRegCirclePlay } from "react-icons/fa6";
+import { FaStop } from "react-icons/fa6";
+import { FaPauseCircle } from "react-icons/fa";
 
 export default function VADBody() {
   const [savedRecordings, setSavedRecordings] = useState(() => {
@@ -17,6 +21,43 @@ export default function VADBody() {
     }
   };
 
+  // نگهداری وضعیت پخش هر فایل
+  const [isPlayingMap, setIsPlayingMap] = useState<{ [key: number]: boolean }>({});
+  const [wavesurfers, setWavesurfers] = useState<any>({});
+
+  const onReady = (ws: any, index: number) => {
+    setWavesurfers((prev: any) => ({
+      ...prev,
+      [index]: ws, // ذخیره wavesurfer برای هر فایل با استفاده از ایندکس
+    }));
+    setIsPlayingMap((prev) => ({
+      ...prev,
+      [index]: false,
+    }));
+  };
+
+  const onPlayPause = (index: number) => {
+    setIsPlayingMap((prev) => {
+      const newMap = { ...prev };
+
+      // اگر یک فایل در حال پخش است، آن را متوقف کنید
+      Object.keys(newMap).forEach((key) => {
+        const keyIndex = parseInt(key); // تبدیل کلید به عدد
+        if (keyIndex !== index) {
+          newMap[keyIndex] = false;
+        }
+      });
+
+      // وضعیت فایل فعلی را تغییر دهید
+      newMap[index] = !newMap[index];
+      return newMap;
+    });
+
+    if (wavesurfers[index]) {
+      wavesurfers[index].playPause();
+    }
+  };
+
   const deleteItem = (index: number) => {
     const updatedRecordings = savedRecordings.filter(
       (_: any, i: number) => i !== index
@@ -27,9 +68,11 @@ export default function VADBody() {
   const handleNewRecording = (recording: { name: string; audio: string }) => {
     setSavedRecordings((prev: any) => [...prev, recording]);
   };
+
   const handleButtonClick = () => {
     document.getElementById("dropzone-file")?.click();
   };
+
   useEffect(() => {
     localStorage.setItem("VAD", JSON.stringify(savedRecordings));
   }, [savedRecordings]);
@@ -49,11 +92,30 @@ export default function VADBody() {
                 (item: { name: string; audio: string }, index: number) => (
                   <div className="mt-2 mb-3" key={index}>
                     <span>{item.name}:</span>
-                    <audio
-                      controls
-                      src={item.audio}
-                      className="w-full mb-2 border-none  rounded-md"
-                    />
+                    <div className="flex items-center w-full border rounded-full px-3 mb-2">
+                      <button className="text-lg mx-2" onClick={() => onPlayPause(index)}>
+                        {isPlayingMap[index] ? (
+                          <span className="text-red-500 text-3xl">
+                            <FaPauseCircle />
+                          </span>
+                        ) : (
+                          <span className="text-blue-500 text-3xl">
+                            <FaRegCirclePlay />
+                          </span>
+                        )}
+                      </button>
+                      <div className="w-5/6 ">
+                        <WavesurferPlayer
+                          height={50}
+                          waveColor="blue"
+                          url={item.audio}
+                          onReady={(ws) => onReady(ws, index)}
+                          onPlay={() => setIsPlayingMap((prev) => ({ ...prev, [index]: true }))}
+                          onPause={() => setIsPlayingMap((prev) => ({ ...prev, [index]: false }))}
+                        />
+                      </div>
+                    </div>
+
                     <div className="flex items-center">
                       <span
                         onClick={() => deleteItem(index)}

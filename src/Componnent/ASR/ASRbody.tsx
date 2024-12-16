@@ -7,6 +7,10 @@ import { IoPauseOutline } from "react-icons/io5";
 import { MdDeleteSweep } from "react-icons/md";
 import { CiSquareChevDown } from "react-icons/ci";
 import VoiceRecorder from "../Share/VoiceRecorder";
+import WavesurferPlayer from "@wavesurfer/react";
+import { FaRegCirclePlay } from "react-icons/fa6";
+
+import { FaPauseCircle } from "react-icons/fa";
 export default function ASRbody() {
   const [savedRecordings, setSavedRecordings] = useState(() => {
     const storage = JSON.parse(localStorage.getItem("ASR") || "[]");
@@ -39,6 +43,42 @@ export default function ASRbody() {
     localStorage.setItem("ASR", JSON.stringify(savedRecordings));
   }, [savedRecordings]);
 
+  const [isPlayingMap, setIsPlayingMap] = useState<{ [key: number]: boolean }>({});
+  const [wavesurfers, setWavesurfers] = useState<any>({});
+
+  const onReady = (ws: any, index: number) => {
+    setWavesurfers((prev: any) => ({
+      ...prev,
+      [index]: ws, // ذخیره wavesurfer برای هر فایل با استفاده از ایندکس
+    }));
+    setIsPlayingMap((prev) => ({
+      ...prev,
+      [index]: false,
+    }));
+  };
+
+  const onPlayPause = (index: number) => {
+    setIsPlayingMap((prev) => {
+      const newMap = { ...prev };
+
+      // اگر یک فایل در حال پخش است، آن را متوقف کنید
+      Object.keys(newMap).forEach((key) => {
+        const keyIndex = parseInt(key); // تبدیل کلید به عدد
+        if (keyIndex !== index) {
+          newMap[keyIndex] = false;
+        }
+      });
+
+      // وضعیت فایل فعلی را تغییر دهید
+      newMap[index] = !newMap[index];
+      return newMap;
+    });
+
+    if (wavesurfers[index]) {
+      wavesurfers[index].playPause();
+    }
+  };
+
   return (
     <div className="bg-blue-50 max-h-screen h-auto flex font-Byekan  mt-20 justify-around">
       <div className="extended-file">
@@ -50,23 +90,43 @@ export default function ASRbody() {
               </span>
             </div>
             <div className="border-b-2 border-gray-600">
-              {savedRecordings.map(
+            {savedRecordings.map(
                 (item: { name: string; audio: string }, index: number) => (
-                  <div className="my-2" key={index}>
+                  <div className="mt-2 mb-3" key={index}>
                     <span>{item.name}:</span>
-                    <audio
-                      controls
-                      src={item.audio}
-                      className="w-full mb-3 border border-red-300 rounded-md"
-                    />
+                    <div className="flex items-center w-full border rounded-full px-3 mb-2">
+                      <button className="text-lg mx-2" onClick={() => onPlayPause(index)}>
+                        {isPlayingMap[index] ? (
+                          <span className="text-red-500 text-3xl">
+                            <FaPauseCircle />
+                          </span>
+                        ) : (
+                          <span className="text-blue-500 text-3xl">
+                            <FaRegCirclePlay />
+                          </span>
+                        )}
+                      </button>
+                      <div className="w-5/6 ">
+                        <WavesurferPlayer
+                          height={50}
+                          waveColor="blue"
+                          url={item.audio}
+                          onReady={(ws) => onReady(ws, index)}
+                          onPlay={() => setIsPlayingMap((prev) => ({ ...prev, [index]: true }))}
+                          onPause={() => setIsPlayingMap((prev) => ({ ...prev, [index]: false }))}
+                        />
+                      </div>
+                    </div>
+
                     <div className="flex items-center">
                       <span
                         onClick={() => deleteItem(index)}
-                        className="text-white text-xl bg-gradient-to-r px-6 py-2 cursor-pointer rounded-2xl from-red-500 to-red-900"
+                        className="text-white text-xl bg-gradient-to-r px-6 py-2 cursor-pointer rounded-2xl hover:scale-105 duration-200 from-red-600 to-red-950"
                       >
                         <MdDeleteForever />
                       </span>
-                      <span className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-3xl from-blue-500 to-blue-900">
+
+                      <span className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950">
                         {" "}
                         تبدیل
                       </span>

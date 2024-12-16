@@ -4,7 +4,7 @@ import { MdDeleteForever, MdDeleteSweep } from "react-icons/md";
 import VoiceRecorder from "../Share/VoiceRecorder";
 import WavesurferPlayer from "@wavesurfer/react";
 import { FaRegCirclePlay } from "react-icons/fa6";
-import { FaStop } from "react-icons/fa6";
+
 import { FaPauseCircle } from "react-icons/fa";
 
 export default function VADBody() {

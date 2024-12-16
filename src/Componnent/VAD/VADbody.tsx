@@ -47,12 +47,12 @@ export default function VADBody() {
             <div className="border-b-2 border-gray-600">
               {savedRecordings.map(
                 (item: { name: string; audio: string }, index: number) => (
-                  <div className="my-2" key={index}>
+                  <div className="mt-2 mb-3" key={index}>
                     <span>{item.name}:</span>
                     <audio
                       controls
                       src={item.audio}
-                      className="w-full mb-3 border border-red-300 rounded-md"
+                      className="w-full mb-2 border-none  rounded-md"
                     />
                     <div className="flex items-center">
                       <span

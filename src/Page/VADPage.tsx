@@ -3,6 +3,6 @@ import VADComponnent from '../Componnent/VAD/VADComponnent'
 
 export default function VADPage() {
   return (
-    <div><VADComponnent/></div>
+    <div className='overflow-auto h-screen'><VADComponnent/></div>
   )
 }

@@ -41,12 +41,12 @@ export default function ASRbody() {
 
   return (
     <div className="bg-blue-50 max-h-screen h-auto flex font-Byekan  mt-20 justify-around">
-     <div className="extended-file">
+      <div className="extended-file">
         {savedRecordings.length > 0 ? (
           <>
             <div className="flex justify-end">
               <span className="text-gray-500 font-Byekan text-lg">
-              : فایل های موجود برای تبدیل به متن قابل ویرایش
+                : فایل های موجود برای تبدیل به متن قابل ویرایش
               </span>
             </div>
             <div className="border-b-2 border-gray-600">
@@ -62,9 +62,13 @@ export default function ASRbody() {
                     <div className="flex items-center">
                       <span
                         onClick={() => deleteItem(index)}
-                        className="text-white text-xl bg-gradient-to-r px-6 py-2 cursor-pointer rounded-2xl from-red-600 to-red-950"
+                        className="text-white text-xl bg-gradient-to-r px-6 py-2 cursor-pointer rounded-2xl from-red-500 to-red-900"
                       >
                         <MdDeleteForever />
+                      </span>
+                      <span className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-3xl from-blue-500 to-blue-900">
+                        {" "}
+                        تبدیل
                       </span>
                     </div>
                   </div>
@@ -89,10 +93,15 @@ export default function ASRbody() {
           </span>
         </div>
         <div className="mt-5 flex items-center" dir="rtl">
-          <span  onClick={() => setIsOpen(!isOpen)} className="text-gray-400 flex items-center cursor-pointer text-lg bg-white rounded-lg px-6 py-3 ">{selectedLanguages}
-          <span className="mr-3"><CiSquareChevDown/></span>
+          <span
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-gray-400 flex items-center cursor-pointer text-lg bg-white rounded-lg px-6 py-3 "
+          >
+            {selectedLanguages}
+            <span className="mr-3">
+              <CiSquareChevDown />
+            </span>
           </span>
-         
         </div>
         {isOpen && (
           <div className="flex mt-2  w-40 items-center z-50 flex-col origin-top-right absolute py-5 px-2 bg-white text-gray-700 rounded-xl text-base">
@@ -146,8 +155,10 @@ export default function ASRbody() {
           )}
         </div>
 
-        <VoiceRecorder nameComponent={"ASR"} 
-          onRecordingComplete={handleNewRecording}/>
+        <VoiceRecorder
+          nameComponent={"ASR"}
+          onRecordingComplete={handleNewRecording}
+        />
       </div>
     </div>
   );

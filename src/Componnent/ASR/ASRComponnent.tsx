@@ -5,9 +5,9 @@ import ASRbody from "./ASRbody";
 
 export default function ASRComponnent() {
   return (
-    <div>
+    <div className='overflow-hidden h-screen'>
       <HeaderMenue />
-      <div className="pb-20 h-screen bg-blue-50">
+      <div className="pb-20 overflow-auto h-[90vh] bg-blue-50">
         <TitleDetails
           title={"ASRابزار تبدیل گفتار انسان به متن"}
           detailes={

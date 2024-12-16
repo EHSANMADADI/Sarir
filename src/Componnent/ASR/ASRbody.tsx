@@ -9,7 +9,6 @@ import { CiSquareChevDown } from "react-icons/ci";
 import VoiceRecorder from "../Share/VoiceRecorder";
 import WavesurferPlayer from "@wavesurfer/react";
 import { FaRegCirclePlay } from "react-icons/fa6";
-
 import { FaPauseCircle } from "react-icons/fa";
 export default function ASRbody() {
   const [savedRecordings, setSavedRecordings] = useState(() => {

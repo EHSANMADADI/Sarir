@@ -5,7 +5,9 @@ import { IoPauseOutline } from 'react-icons/io5';
 import { MdDeleteForever, MdDeleteSweep, MdRectangle } from 'react-icons/md';
 import { PiRecordFill } from 'react-icons/pi';
 import VoiceRecorder from '../Share/VoiceRecorder';
-
+import WavesurferPlayer from "@wavesurfer/react";
+import { FaRegCirclePlay } from "react-icons/fa6";
+import { FaPauseCircle } from "react-icons/fa";
 export default function Body() {
   const [savedRecordings, setSavedRecordings] = useState(() => {
     const storage = JSON.parse(localStorage.getItem("Speech") || "[]");
@@ -23,6 +25,41 @@ export default function Body() {
     if (selectedFile) {
       console.log("Selected file:", selectedFile.name);
       setFile(selectedFile);
+    }
+  };
+  const [isPlayingMap, setIsPlayingMap] = useState<{ [key: number]: boolean }>({});
+  const [wavesurfers, setWavesurfers] = useState<any>({});
+
+  const onReady = (ws: any, index: number) => {
+    setWavesurfers((prev: any) => ({
+      ...prev,
+      [index]: ws, // ذخیره wavesurfer برای هر فایل با استفاده از ایندکس
+    }));
+    setIsPlayingMap((prev) => ({
+      ...prev,
+      [index]: false,
+    }));
+  };
+
+  const onPlayPause = (index: number) => {
+    setIsPlayingMap((prev) => {
+      const newMap = { ...prev };
+
+      // اگر یک فایل در حال پخش است، آن را متوقف کنید
+      Object.keys(newMap).forEach((key) => {
+        const keyIndex = parseInt(key); // تبدیل کلید به عدد
+        if (keyIndex !== index) {
+          newMap[keyIndex] = false;
+        }
+      });
+
+      // وضعیت فایل فعلی را تغییر دهید
+      newMap[index] = !newMap[index];
+      return newMap;
+    });
+
+    if (wavesurfers[index]) {
+      wavesurfers[index].playPause();
     }
   };
   
@@ -52,15 +89,34 @@ export default function Body() {
               </span>
             </div>
             <div className="border-b-2 border-gray-600">
-              {savedRecordings.map(
+            {savedRecordings.map(
                 (item: { name: string; audio: string }, index: number) => (
-                  <div className="my-2" key={index}>
+                  <div className="mt-2 mb-3" key={index}>
                     <span>{item.name}:</span>
-                    <audio
-                      controls
-                      src={item.audio}
-                      className="w-full mb-3 border border-red-300 rounded-md"
-                    />
+                    <div className="flex items-center w-full border rounded-full px-3 mb-2">
+                      <button className="text-lg mx-2" onClick={() => onPlayPause(index)}>
+                        {isPlayingMap[index] ? (
+                          <span className="text-red-500 text-3xl">
+                            <FaPauseCircle />
+                          </span>
+                        ) : (
+                          <span className="text-blue-500 text-3xl">
+                            <FaRegCirclePlay />
+                          </span>
+                        )}
+                      </button>
+                      <div className="w-5/6 ">
+                        <WavesurferPlayer
+                          height={50}
+                          waveColor="blue"
+                          url={item.audio}
+                          onReady={(ws) => onReady(ws, index)}
+                          onPlay={() => setIsPlayingMap((prev) => ({ ...prev, [index]: true }))}
+                          onPause={() => setIsPlayingMap((prev) => ({ ...prev, [index]: false }))}
+                        />
+                      </div>
+                    </div>
+
                     <div className="flex items-center">
                       <span
                         onClick={() => deleteItem(index)}

@@ -11,7 +11,9 @@ import WavesurferPlayer from "@wavesurfer/react";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { FaPauseCircle } from "react-icons/fa";
 import api from "../../Config/api";
-import loader from'../../IMG/tail-spin.svg'
+import loader from "../../IMG/tail-spin.svg";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export default function ASRbody() {
   const [savedRecordings, setSavedRecordings] = useState(() => {
     const storage = JSON.parse(localStorage.getItem("ASR") || "[]");
@@ -109,14 +111,14 @@ export default function ASRbody() {
         alert("فایلی برای ارسال یافت نشد.");
         return;
       }
-  
+
       // فعال کردن وضعیت "صبر کنید" برای دکمه مربوطه
       setConverting((prev) => {
         const updated = [...prev];
         updated[index] = true;
         return updated;
       });
-  
+
       // تبدیل Base64 به Blob
       const base64Data = recording.audio.split(",")[1]; // حذف prefix
       const byteCharacters = atob(base64Data);
@@ -125,20 +127,20 @@ export default function ASRbody() {
         .map((_, i) => byteCharacters.charCodeAt(i));
       const byteArray = new Uint8Array(byteNumbers);
       const audioBlob = new Blob([byteArray], { type: "audio/webm" });
-  
+
       // ایجاد FormData و ارسال درخواست
       const formData = new FormData();
       formData.append("file", audioBlob, `${recording.name}.webm`);
-  
+
       const response = await api.post("/api/transcribe/file", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
+      toast.success("پردازش با موفقیت به اتمام رسید");
+
       console.log("نتیجه سرور:", response.data.transcription);
-      alert("فایل با موفقیت ارسال شد.");
     } catch (err) {
       console.error("خطا در ارسال فایل:", err);
-      alert("خطایی رخ داد.");
+      toast.error("مشکلی پیش آمده لطفا دوباره تلاش کنید");
     } finally {
       // بازگرداندن وضعیت دکمه به حالت اولیه
       setConverting((prev) => {
@@ -148,7 +150,6 @@ export default function ASRbody() {
       });
     }
   };
-  
 
   return (
     <div className="bg-blue-50 max-h-screen h-auto flex font-Byekan  mt-20 justify-around">
@@ -210,12 +211,9 @@ export default function ASRbody() {
                         <MdDeleteForever />
                       </span>
                       {converting[index] ? (
-                        <span
-                         
-                          className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950"
-                        >
+                        <span className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950">
                           {" "}
-                            <img src={loader} className="w-6 h-5"/>
+                          <img src={loader} className="w-6 h-5" />
                         </span>
                       ) : (
                         <span
@@ -316,6 +314,7 @@ export default function ASRbody() {
           onRecordingComplete={handleNewRecording}
         />
       </div>
+      <ToastContainer position="bottom-right" />
     </div>
   );
 }

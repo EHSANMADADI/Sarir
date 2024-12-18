@@ -1,34 +1,57 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { PiRecordFill } from "react-icons/pi";
 import { FaPlay } from "react-icons/fa";
 import { MdDeleteForever, MdRectangle } from "react-icons/md";
-import { IoPauseOutline } from "react-icons/io5";
 import { MdDeleteSweep } from "react-icons/md";
 import { CiSquareChevDown } from "react-icons/ci";
 import VoiceRecorder from "../Share/VoiceRecorder";
 import WavesurferPlayer from "@wavesurfer/react";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { FaPauseCircle } from "react-icons/fa";
+import api from "../../Config/api";
+import loader from'../../IMG/tail-spin.svg'
 export default function ASRbody() {
   const [savedRecordings, setSavedRecordings] = useState(() => {
     const storage = JSON.parse(localStorage.getItem("ASR") || "[]");
     return storage;
   });
+  const [converting, setConverting] = useState<boolean[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState("فارسی");
   const listLanguage = ["فارسی", "عربی", "عبری", "انگلیسی"];
+
+  useEffect(() => {
+    setConverting(new Array(savedRecordings.length).fill(false));
+  }, [savedRecordings]);
+
   const handleButtonClick = () => {
     document.getElementById("dropzone-file")?.click();
   };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       console.log("Selected file:", selectedFile.name);
-      setFile(selectedFile);
+      // تبدیل فایل به Base64
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64Audio = reader.result as string;
+        // ایجاد شیء جدید برای فایل
+        const newRecording = {
+          name: selectedFile.name,
+          audio: base64Audio,
+        };
+
+        // افزودن به لیست فایل‌ها
+        setSavedRecordings((prev: any) => [...prev, newRecording]);
+      };
+      reader.readAsDataURL(selectedFile);
     }
   };
+
   const deleteItem = (index: number) => {
     const updatedRecordings = savedRecordings.filter(
       (_: any, i: number) => i !== index
@@ -42,7 +65,9 @@ export default function ASRbody() {
     localStorage.setItem("ASR", JSON.stringify(savedRecordings));
   }, [savedRecordings]);
 
-  const [isPlayingMap, setIsPlayingMap] = useState<{ [key: number]: boolean }>({});
+  const [isPlayingMap, setIsPlayingMap] = useState<{ [key: number]: boolean }>(
+    {}
+  );
   const [wavesurfers, setWavesurfers] = useState<any>({});
 
   const onReady = (ws: any, index: number) => {
@@ -77,6 +102,53 @@ export default function ASRbody() {
       wavesurfers[index].playPause();
     }
   };
+  const handelConvert = async (index: number) => {
+    try {
+      const recording = savedRecordings[index];
+      if (!recording || !recording.audio) {
+        alert("فایلی برای ارسال یافت نشد.");
+        return;
+      }
+  
+      // فعال کردن وضعیت "صبر کنید" برای دکمه مربوطه
+      setConverting((prev) => {
+        const updated = [...prev];
+        updated[index] = true;
+        return updated;
+      });
+  
+      // تبدیل Base64 به Blob
+      const base64Data = recording.audio.split(",")[1]; // حذف prefix
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length)
+        .fill(0)
+        .map((_, i) => byteCharacters.charCodeAt(i));
+      const byteArray = new Uint8Array(byteNumbers);
+      const audioBlob = new Blob([byteArray], { type: "audio/webm" });
+  
+      // ایجاد FormData و ارسال درخواست
+      const formData = new FormData();
+      formData.append("file", audioBlob, `${recording.name}.webm`);
+  
+      const response = await api.post("/api/transcribe/file", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+  
+      console.log("نتیجه سرور:", response.data.transcription);
+      alert("فایل با موفقیت ارسال شد.");
+    } catch (err) {
+      console.error("خطا در ارسال فایل:", err);
+      alert("خطایی رخ داد.");
+    } finally {
+      // بازگرداندن وضعیت دکمه به حالت اولیه
+      setConverting((prev) => {
+        const updated = [...prev];
+        updated[index] = false;
+        return updated;
+      });
+    }
+  };
+  
 
   return (
     <div className="bg-blue-50 max-h-screen h-auto flex font-Byekan  mt-20 justify-around">
@@ -89,12 +161,15 @@ export default function ASRbody() {
               </span>
             </div>
             <div className="border-b-2 border-gray-600">
-            {savedRecordings.map(
+              {savedRecordings.map(
                 (item: { name: string; audio: string }, index: number) => (
                   <div className="mt-2 mb-3" key={index}>
                     <span>{item.name}:</span>
                     <div className="flex items-center w-full border rounded-full px-3 mb-2">
-                      <button className="text-lg mx-2" onClick={() => onPlayPause(index)}>
+                      <button
+                        className="text-lg mx-2"
+                        onClick={() => onPlayPause(index)}
+                      >
                         {isPlayingMap[index] ? (
                           <span className="text-red-500 text-3xl">
                             <FaPauseCircle />
@@ -111,8 +186,18 @@ export default function ASRbody() {
                           waveColor="blue"
                           url={item.audio}
                           onReady={(ws) => onReady(ws, index)}
-                          onPlay={() => setIsPlayingMap((prev) => ({ ...prev, [index]: true }))}
-                          onPause={() => setIsPlayingMap((prev) => ({ ...prev, [index]: false }))}
+                          onPlay={() =>
+                            setIsPlayingMap((prev) => ({
+                              ...prev,
+                              [index]: true,
+                            }))
+                          }
+                          onPause={() =>
+                            setIsPlayingMap((prev) => ({
+                              ...prev,
+                              [index]: false,
+                            }))
+                          }
                         />
                       </div>
                     </div>
@@ -124,11 +209,23 @@ export default function ASRbody() {
                       >
                         <MdDeleteForever />
                       </span>
-
-                      <span className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950">
-                        {" "}
-                        تبدیل
-                      </span>
+                      {converting[index] ? (
+                        <span
+                         
+                          className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950"
+                        >
+                          {" "}
+                            <img src={loader} className="w-6 h-5"/>
+                        </span>
+                      ) : (
+                        <span
+                          onClick={() => handelConvert(index)}
+                          className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950"
+                        >
+                          {" "}
+                          تبدیل
+                        </span>
+                      )}
                     </div>
                   </div>
                 )

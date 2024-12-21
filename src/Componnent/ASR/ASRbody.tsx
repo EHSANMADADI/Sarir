@@ -14,19 +14,27 @@ import api from "../../Config/api";
 import loader from "../../IMG/tail-spin.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Modal from "../Share/Modal";
 export default function ASRbody() {
   const [savedRecordings, setSavedRecordings] = useState(() => {
     const storage = JSON.parse(localStorage.getItem("ASR") || "[]");
     return storage;
   });
   const [converting, setConverting] = useState<boolean[]>([]);
+  const [sucsessFullConverting, setSucsessFullConverting] = useState<boolean[]>(
+    []
+  );
   const [file, setFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState("فارسی");
   const listLanguage = ["فارسی", "عربی", "عبری", "انگلیسی"];
+  const [openModals, setOpenModals] = useState<boolean[]>([]);
+  const [text, setText] = useState<string[]>([]);
 
   useEffect(() => {
     setConverting(new Array(savedRecordings.length).fill(false));
+    setSucsessFullConverting(new Array(savedRecordings.length).fill(false));
+    setText(new Array(savedRecordings.length).fill(""));
   }, [savedRecordings]);
 
   const handleButtonClick = () => {
@@ -136,8 +144,17 @@ export default function ASRbody() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("پردازش با موفقیت به اتمام رسید");
-
       console.log("نتیجه سرور:", response.data.transcription);
+      setText((prev) => {
+        const updated = [...prev];
+        updated[index] = response.data.transcription;
+        return updated;
+      });
+      setSucsessFullConverting((prev) => {
+        const updated = [...prev];
+        updated[index] = true;
+        return updated;
+      });
     } catch (err) {
       console.error("خطا در ارسال فایل:", err);
       toast.error("مشکلی پیش آمده لطفا دوباره تلاش کنید");
@@ -150,9 +167,22 @@ export default function ASRbody() {
       });
     }
   };
+  const handelOpenModal = (index: number) => {
+    setOpenModals((prev) => {
+      const updated = [...prev];
+      updated[index] = true;
+      return updated;
+    });
+  };
+
+  const handleModalClose = (index: number) => {
+    const updatedOpenModals = [...openModals];
+    updatedOpenModals[index] = false;
+    setOpenModals(updatedOpenModals);
+  };
 
   return (
-    <div className="bg-blue-50 max-h-screen h-auto flex font-Byekan  mt-20 justify-around">
+    <div className="bg-blue-50 max-h-screen h-auto flex font-Byekan mx-auto mt-20 justify-around overflow-x-clip">
       <div className="extended-file">
         {savedRecordings.length > 0 ? (
           <>
@@ -215,7 +245,7 @@ export default function ASRbody() {
                           {" "}
                           <img src={loader} className="w-6 h-5" />
                         </span>
-                      ) : (
+                      ) : !sucsessFullConverting[index] ? (
                         <span
                           onClick={() => handelConvert(index)}
                           className="text-white text-base mx-2 bg-gradient-to-r px-16 py-2 cursor-pointer hover:scale-105 duration-200 rounded-2xl from-blue-600 to-blue-950"
@@ -223,8 +253,27 @@ export default function ASRbody() {
                           {" "}
                           تبدیل
                         </span>
+                      ) : (
+                        <span
+                          onClick={() => handelOpenModal(index)}
+                          className="text-black border-black border-2 border-dashed text-base mx-2 px-14 py-1 cursor-pointer  rounded-2xl"
+                        >
+                          نمایش
+                        </span>
                       )}
                     </div>
+                    <Modal
+                      Open={openModals[index]}
+                      onClose={() => handleModalClose(index)}
+                    >
+                      {
+                        <div  dir="rtl" className="w-full">
+                          <span className="font-bold text-lg my-5">
+                            {text[index]}
+                          </span>
+                        </div>
+                      }
+                    </Modal>
                   </div>
                 )
               )}
@@ -275,7 +324,7 @@ export default function ASRbody() {
         )}
       </div>
 
-      <div className="input-div ">
+      <div className="input-div justify-start">
         <input
           id="dropzone-file"
           type="file"

@@ -9,7 +9,6 @@ interface VoiceRecorderProps {
   onRecordingComplete: (recording: { name: string; audio: string }) => void;
 }
 
-
 export default function VoiceRecorder({
   nameComponent,
   onRecordingComplete,
@@ -21,7 +20,7 @@ export default function VoiceRecorder({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null); // Ref for the timer
-
+  const {audioURLs, setAudioURLs, fileNames, setFileNames} = useStore();
 
   const handleStartRecording = async () => {
     try {
@@ -42,12 +41,16 @@ export default function VoiceRecorder({
           const base64Audio = reader.result as string;
           const recording = { name: fileName, audio: base64Audio };
 
-          // Save to localStorage
+          // // Save to localStorage
           const recordings = JSON.parse(
             localStorage.getItem(nameComponent) || "[]"
           );
           recordings.push(recording);
           localStorage.setItem(nameComponent, JSON.stringify(recordings));
+
+          // // ذخیره در Zustand
+          // setAudioURLs(base64Audio);
+          // setFileNames(fileName);
 
           // Update parent state
           onRecordingComplete(recording);
@@ -125,32 +128,32 @@ export default function VoiceRecorder({
 
   return (
     <div>
-      <div className="flex justify-end mb-7">
+      {/* <div className="flex justify-end mb-7">
         <span className="text-gray-500 font-Byekan font-bold text-lg">
           :رکورد فایل
         </span>
-      </div>
-      <div className="mb-5">
+      </div> */}
+      <div className="my-5 flex justify-center ">
         <input
           placeholder="اسم فایل رکورد ..."
           type="text"
           dir="rtl"
           value={fileName}
           onChange={(e) => setFileName(e.target.value)}
-          className="bg-white focus:outline-blue-600 focus:outline-4 border border-gray-200 px-5 py-1"
+          className="bg-white focus:outline-blue-600 focus:outline-4 border border-gray-100 rounded px-5 py-1"
         />
       </div>
-      <div className="flex items-center justify-center mb-5">
+      <div className="flex items-center justify-center my-5">
         {!isRecording && (
           <div
             onClick={fileName ? handleStartRecording : undefined}
             className={`${
               fileName
-                ? "bg-gray-200 cursor-pointer"
-                : "bg-gray-400 cursor-not-allowed"
-            } p-3 rounded-full mx-1 animate-bounce`}
+                ? "bg-blue-500 cursor-pointer"
+                : "bg-blue-700 cursor-not-allowed"
+            } p-3 rounded-full mx-1`}
           >
-            <span className="text-white text-2xl">
+            <span className="text-white text-6xl">
               <CiMicrophoneOn />
             </span>
           </div>

@@ -3,11 +3,12 @@ import { FaPlay } from "react-icons/fa";
 import { IoPauseOutline } from "react-icons/io5";
 import { MdRectangle } from "react-icons/md";
 import { CiMicrophoneOn } from "react-icons/ci";
-
+import { useStore } from "../../Store/Store";
 interface VoiceRecorderProps {
   nameComponent: string;
   onRecordingComplete: (recording: { name: string; audio: string }) => void;
 }
+
 
 export default function VoiceRecorder({
   nameComponent,
@@ -20,6 +21,7 @@ export default function VoiceRecorder({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null); // Ref for the timer
+
 
   const handleStartRecording = async () => {
     try {
@@ -146,7 +148,7 @@ export default function VoiceRecorder({
               fileName
                 ? "bg-gray-200 cursor-pointer"
                 : "bg-gray-400 cursor-not-allowed"
-            } p-3 rounded-full mx-1`}
+            } p-3 rounded-full mx-1 animate-bounce`}
           >
             <span className="text-white text-2xl">
               <CiMicrophoneOn />

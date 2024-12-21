@@ -35,7 +35,7 @@ export default function ASRbody() {
     setConverting(new Array(savedRecordings.length).fill(false));
     setSucsessFullConverting(new Array(savedRecordings.length).fill(false));
     setText(new Array(savedRecordings.length).fill(""));
-  }, [savedRecordings]);
+  }, [savedRecordings,selectedLanguages]);
 
   const handleButtonClick = () => {
     document.getElementById("dropzone-file")?.click();
@@ -139,6 +139,30 @@ export default function ASRbody() {
       // ایجاد FormData و ارسال درخواست
       const formData = new FormData();
       formData.append("file", audioBlob, `${recording.name}.webm`);
+      switch (selectedLanguages) {
+        case "فارسی":
+          formData.append("language", "persian");
+          console.log("fa");
+
+          break;
+        case "عربی":
+          formData.append("language", "arabic");
+          console.log("arab");
+          break;
+        case "عبری":
+          formData.append("language", "hebrew");
+          console.log("ebri");
+          break;
+        case "انگلیسی":
+          formData.append("language", "english");
+          console.log("en");
+          break;
+
+        default:
+          formData.append("language", "persian");
+          break;
+      }
+      console.log(formData);
 
       const response = await api.post("/api/transcribe/file", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -180,6 +204,22 @@ export default function ASRbody() {
     updatedOpenModals[index] = false;
     setOpenModals(updatedOpenModals);
   };
+  const handelDownLoadText = (index: number) => {
+    const content = text[index]; // متن مربوط به آیتم مورد نظر
+    if (!content) {
+      toast.error("مشکلی در دانلود فایل وجود دارد لطفا دوباره تلاش کنید");
+      return;
+    }
+  
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `transcription-${index + 1}.txt`; // نام فایل دانلودی
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  
 
   return (
     <div className="bg-blue-50 max-h-screen h-auto flex font-Byekan mx-auto mt-20 justify-around overflow-x-clip">
@@ -191,7 +231,7 @@ export default function ASRbody() {
                 : فایل های موجود برای تبدیل به متن قابل ویرایش
               </span>
             </div>
-            <div className="border-b-2 border-gray-600">
+            <div className="border-b-2 border-gray-600 max-h-[70vh] overflow-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-blue-300">
               {savedRecordings.map(
                 (item: { name: string; audio: string }, index: number) => (
                   <div className="mt-2 mb-3" key={index}>
@@ -211,7 +251,7 @@ export default function ASRbody() {
                           </span>
                         )}
                       </button>
-                      <div className="w-5/6 ">
+                      <div className="w-72 ">
                         <WavesurferPlayer
                           height={50}
                           waveColor="blue"
@@ -254,26 +294,39 @@ export default function ASRbody() {
                           تبدیل
                         </span>
                       ) : (
-                        <span
+                        <>
+                          <span
                           onClick={() => handelOpenModal(index)}
-                          className="text-black border-black border-2 border-dashed text-base mx-2 px-14 py-1 cursor-pointer  rounded-2xl"
+                          className="text-black border-black border-2 border-dashed text-base mx-2 px-14 py-1 cursor-pointer  rounded-2xl hover:bg-gray-50"
                         >
                           نمایش
                         </span>
+
+                        <span
+                          onClick={() => handelDownLoadText(index)}
+                          className="text-black border-black border-2 border-dashed text-base mx-2 px-14 py-1 cursor-pointer  rounded-2xl hover:bg-gray-50"
+                        >
+                          دانلود
+                        </span>
+                       
+                        </>
+                      
                       )}
                     </div>
-                    <Modal
-                      Open={openModals[index]}
-                      onClose={() => handleModalClose(index)}
-                    >
-                      {
-                        <div  dir="rtl" className="w-full">
-                          <span className="font-bold text-lg my-5">
-                            {text[index]}
-                          </span>
-                        </div>
-                      }
-                    </Modal>
+                    <div className="w-1/2">
+                      <Modal
+                        Open={openModals[index]}
+                        onClose={() => handleModalClose(index)}
+                      >
+                        {
+                          <div dir="rtl" className="w-full">
+                            <span className="font-bold text-lg my-5">
+                              {text[index]}
+                            </span>
+                          </div>
+                        }
+                      </Modal>
+                    </div>
                   </div>
                 )
               )}
